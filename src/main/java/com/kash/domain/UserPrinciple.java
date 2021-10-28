@@ -5,11 +5,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.stream;
-import static java.util.stream.Nodes.collect;
+
 
 public class UserPrinciple implements UserDetails {
 
