@@ -4,12 +4,14 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.kash.domain.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import static org.springframework.http.HttpStatus.*;
@@ -26,6 +28,7 @@ public class ExceptionHandling {
     private static final String NOT_ENOUGH_PERMISSION = "You do not have enough permission";
     public static final String ERROR_PATH = "/error";
 
+    //2
     @ExceptionHandler(DisabledException.class)
     public ResponseEntity<HttpResponse> accountDisabledException() {
         return createHttpResponse(BAD_REQUEST, ACCOUNT_DISABLED);
@@ -105,7 +108,7 @@ public class ExceptionHandling {
         LOGGER.error(exception.getMessage());
         return createHttpResponse(INTERNAL_SERVER_ERROR, ERROR_PROCESSING_FILE);
     }
-
+    //1
     private ResponseEntity<HttpResponse> createHttpResponse(HttpStatus httpStatus, String message) {
         return new ResponseEntity<>(new HttpResponse(httpStatus.value(), httpStatus,
                 httpStatus.getReasonPhrase().toUpperCase(), message), httpStatus);
