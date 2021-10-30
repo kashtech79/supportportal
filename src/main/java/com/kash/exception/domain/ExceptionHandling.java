@@ -125,8 +125,8 @@ public class ExceptionHandling {
         return createHttpResponse(NOT_FOUND, "There is no mapping for this URL");
     }
 
-    @Override
-    public String getErrorPath() {
-        return ERROR_PATH;
-    }
+//    @Override
+//    public String getErrorPath() {
+//        return ERROR_PATH;
+//    }
 }
