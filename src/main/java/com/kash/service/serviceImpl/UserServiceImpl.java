@@ -12,9 +12,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.transaction.Transactional;
 import java.util.Date;
+import java.util.List;
 
 @Service
 @Transactional
@@ -44,5 +46,31 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             LOGGER.info("Returning found user by username:" + username);
             return userPrincipal;
         }
+    }
+
+    public User register(String firstName, String lastName, String username, String email) {
+        validNewUsernameAndEmail();
+        return null;
+    }
+
+    private User validNewUsernameAndEmail(String currentUsername, String newUsername, String newEmail) {
+        if(StringUtils.isNotBlank(currentUsername)){
+            User currentUser = findUserByUsername(currentUsername);
+            if(currentUser == null){
+                throw new UsernameNotFoundException("No user found by username" + currentUsername);
+            }
+        }
+    }
+
+    public List<User> getUsers() {
+        return null;
+    }
+
+    public User findUserByUsername(String username) {
+        return null;
+    }
+
+    public User findUserByEmail(String email) {
+        return null;
     }
 }
