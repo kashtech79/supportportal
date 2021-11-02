@@ -7,6 +7,7 @@ import com.kash.exception.domain.EmailNotFoundException;
 import com.kash.exception.domain.UsernameExistException;
 import com.kash.repository.UserRepository;
 import com.kash.service.UserService;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,27 +15,34 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 
+import static com.kash.enumeration.Role.ROLE_USER;
+
 @Service
 @Transactional
 @Qualifier("UserDetailService")
 public class UserServiceImpl implements UserService, UserDetailsService {
-
+    //1
     private Logger LOGGER = LoggerFactory.getLogger(getClass());
     private UserRepository userRepository;
+    //8
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-
+    //2
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findUserByUsername(username);
@@ -52,10 +60,52 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     public User register(String firstName, String lastName, String username, String email) throws EmailNotFoundException, EmailExistException {
+        //3
         validNewUsernameAndEmail(StringUtils.EMPTY, username, email);
+        //5
+        User user = new User();
+        user.setUserId(generateUserId());
+        String password = generatePassword();
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setJoinDate(new Date());
+        user.setPassword(encodePassword(password));
+        user.setActive(true);
+        user.setNotLocked(true);
+        user.setRole(ROLE_USER.name());
+        user.setAuthorities(ROLE_USER.getAuthorities());
+        user.setProfileImageUrl(getTemporaryProfileImageUrl(username));
+        userRepository.save(user);
+        LOGGER.info("New user password: " + password);
+//        emailService.sendNewPasswordEmail(firstName, password, email);
+//        return user;
         return null;
     }
 
+    //10
+    private String getTemporaryProfileImageUrl() {
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path("/user/image/profile/temp").toUriString();
+    }
+
+    //9
+    private String encodePassword(String password) {
+        return passwordEncoder.encode(password);
+    }
+
+
+    //7
+    private String generatePassword() {
+        return RandomStringUtils.randomAlphanumeric(count:10)
+    }
+
+    //6
+    private String generateUserId(){
+        return RandomStringUtils.randomNumeric(count:10)
+    }
+
+    //4
     private User validNewUsernameAndEmail(String currentUsername, String newUsername, String newEmail) throws EmailNotFoundException, EmailExistException {
         if(StringUtils.isNotBlank(currentUsername)){
             User currentUser = findUserByUsername(currentUsername);
