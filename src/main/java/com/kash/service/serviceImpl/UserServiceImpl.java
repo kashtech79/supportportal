@@ -59,29 +59,30 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
     }
 
-    public User register(String firstName, String lastName, String username, String email) throws EmailNotFoundException, EmailExistException {
+    public User register(String firstName, String lastName, String username, String email) throws EmailExistException, UsernameExistException {
         //3
         validNewUsernameAndEmail(StringUtils.EMPTY, username, email);
         //5
         User user = new User();
         user.setUserId(generateUserId());
         String password = generatePassword();
+        String encodedPassword = encodePassword(password);
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setUsername(username);
         user.setEmail(email);
         user.setJoinDate(new Date());
-        user.setPassword(encodePassword(password));
+        user.setPassword(encodedPassword);
         user.setActive(true);
         user.setNotLocked(true);
         user.setRole(ROLE_USER.name());
         user.setAuthorities(ROLE_USER.getAuthorities());
-        user.setProfileImageUrl(getTemporaryProfileImageUrl(username));
+        user.setProfileImageUrl(getTemporaryProfileImageUrl());
         userRepository.save(user);
         LOGGER.info("New user password: " + password);
 //        emailService.sendNewPasswordEmail(firstName, password, email);
 //        return user;
-        return null;
+        return user;
     }
 
     //10
@@ -91,22 +92,22 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     //9
     private String encodePassword(String password) {
-        return passwordEncoder.encode(password);
+        return bCryptPasswordEncoder.encode(password);
     }
 
 
     //7
     private String generatePassword() {
-        return RandomStringUtils.randomAlphanumeric(count:10)
+        return RandomStringUtils.randomAlphanumeric(10);
     }
 
     //6
     private String generateUserId(){
-        return RandomStringUtils.randomNumeric(count:10)
+        return RandomStringUtils.randomNumeric(10);
     }
 
     //4
-    private User validNewUsernameAndEmail(String currentUsername, String newUsername, String newEmail) throws EmailNotFoundException, EmailExistException {
+    private User validNewUsernameAndEmail(String currentUsername, String newUsername, String newEmail) throws EmailExistException, UsernameExistException {
         if(StringUtils.isNotBlank(currentUsername)){
             User currentUser = findUserByUsername(currentUsername);
             if(currentUser == null){
@@ -118,18 +119,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             }
 
             User userByNewEmail = findUserByEmail(newEmail);
-            if)(userByNewEmail != null && currentUser.getId().equals(userByNewEmail.getId())){
+            if(userByNewEmail != null && currentUser.getId().equals(userByNewEmail.getId())){
                 throw new EmailExistException("Username already exist!");
             }
             return currentUser;
         } else {
             User userByUsername = findUserByUsername(newUsername);
             if(userByUsername != null){
-                throw new UsernameExistException("Username already exists")
+                throw new UsernameExistException("Username already exists");
             }
 
             User userByEmail = findUserByEmail(newEmail);
-            if)(userByEmail != null){
+            if(userByEmail != null){
                 throw new EmailExistException("Username already exist!");
             }
             return null;
