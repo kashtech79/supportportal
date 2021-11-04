@@ -111,7 +111,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     //4
     private User validNewUsernameAndEmail(String currentUsername, String newUsername, String newEmail) throws EmailExistException, UsernameExistException {
-        User userByNewUsername = findUserByUsername(currentUsername);
+        User userByNewUsername = findUserByUsername(newUsername);
         User userByNewEmail = findUserByEmail(newEmail);
         if(StringUtils.isNotBlank(currentUsername)){
             User currentUser = findUserByUsername(currentUsername);
