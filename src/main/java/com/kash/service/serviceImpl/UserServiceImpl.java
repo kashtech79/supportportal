@@ -24,12 +24,15 @@ import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 
+import static com.kash.constant.UserImplConstant.*;
 import static com.kash.enumeration.Role.ROLE_USER;
 
 @Service
 @Transactional
 @Qualifier("UserDetailService")
 public class UserServiceImpl implements UserService, UserDetailsService {
+
+
     //1
     private Logger LOGGER = LoggerFactory.getLogger(getClass());
     private UserRepository userRepository;
@@ -47,14 +50,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findUserByUsername(username);
         if(user == null){
-            LOGGER.error("User not found by username: " + username);
-            throw new UsernameNotFoundException("User doesn't exist: "  + username);
+            LOGGER.error(NO_USER_FOUND_BY_USERNAME + username);
+            throw new UsernameNotFoundException(NO_USER_FOUND_BY_USERNAME  + username);
         }else {
             user.setLastLoginDateDisplay((user.getLastLoginDate()));
             user.setLastLoginDate(new Date());
             userRepository.save(user);
             UserPrincipal userPrincipal = new UserPrincipal(user);
-            LOGGER.info("Returning found user by username:" + username);
+            LOGGER.info(FOUND_USER_BY_USERNAME + username);
             return userPrincipal;
         }
     }
@@ -87,7 +90,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     //10
     private String getTemporaryProfileImageUrl() {
-        return ServletUriComponentsBuilder.fromCurrentContextPath().path("/user/image/profile/temp").toUriString();
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path(DEFAULT_USER_IMAGE_PATH).toUriString();
     }
 
     //9
@@ -108,44 +111,47 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     //4
     private User validNewUsernameAndEmail(String currentUsername, String newUsername, String newEmail) throws EmailExistException, UsernameExistException {
+        User userByNewUsername = findUserByUsername(currentUsername);
+        User userByNewEmail = findUserByEmail(newEmail);
         if(StringUtils.isNotBlank(currentUsername)){
             User currentUser = findUserByUsername(currentUsername);
             if(currentUser == null){
-                throw new UsernameNotFoundException("No user found by username" + currentUsername);
-            }
-            User userByNewUsername = findUserByUsername(currentUsername);
-            if(userByNewUsername != null && currentUser.getId().equals(userByNewUsername.getId())){
-                throw new UsernameExistException("Username already exist!");
+                throw new UsernameNotFoundException(NO_USER_FOUND_BY_USERNAME + currentUsername);
             }
 
-            User userByNewEmail = findUserByEmail(newEmail);
+            if(userByNewUsername != null && currentUser.getId().equals(userByNewUsername.getId())){
+                throw new UsernameExistException(USERNAME_ALREADY_EXIST);
+            }
+
+
             if(userByNewEmail != null && currentUser.getId().equals(userByNewEmail.getId())){
-                throw new EmailExistException("Username already exist!");
+                throw new EmailExistException(EMAIL_ALREADY_EXIST);
             }
             return currentUser;
         } else {
-            User userByUsername = findUserByUsername(newUsername);
-            if(userByUsername != null){
-                throw new UsernameExistException("Username already exists");
+            if(userByNewUsername != null){
+                throw new UsernameExistException(USERNAME_ALREADY_EXISTS);
             }
 
-            User userByEmail = findUserByEmail(newEmail);
-            if(userByEmail != null){
-                throw new EmailExistException("Username already exist!");
+            if(userByNewEmail != null){
+                throw new EmailExistException(EMAIL_ALREADY_EXIST);
             }
             return null;
         }
     }
 
     public List<User> getUsers() {
-        return null;
+
+        return userRepository.findAll();
     }
 
     public User findUserByUsername(String username) {
-        return null;
+
+        return userRepository.findUserByUsername(username);
     }
 
     public User findUserByEmail(String email) {
-        return null;
+
+        return userRepository.findUserByEmail(email);
     }
 }
