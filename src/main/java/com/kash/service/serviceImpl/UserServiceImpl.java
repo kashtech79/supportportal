@@ -4,6 +4,7 @@ import com.kash.domain.User;
 import com.kash.domain.UserPrincipal;
 import com.kash.exception.domain.EmailExistException;
 import com.kash.exception.domain.EmailNotFoundException;
+import com.kash.exception.domain.UserNotFoundException;
 import com.kash.exception.domain.UsernameExistException;
 import com.kash.repository.UserRepository;
 import com.kash.service.UserService;

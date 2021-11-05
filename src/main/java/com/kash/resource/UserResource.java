@@ -26,9 +26,9 @@ public class UserResource extends ExceptionHandling {
     private JWTTokenProvider jwtTokenProvider;
 
     @Autowired
-    public UserResource(UserService userService, AuthenticationManager authenticationManager, JWTTokenProvider jwtTokenProvider) {
-        this.userService = userService;
+    public UserResource(AuthenticationManager authenticationManager, UserService userService, JWTTokenProvider jwtTokenProvider) {
         this.authenticationManager = authenticationManager;
+        this.userService = userService;
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
@@ -49,11 +49,12 @@ public class UserResource extends ExceptionHandling {
     }
 
     //3
-    private HttpHeaders getJwtHeader(UserPrincipal userPrincipal) {
+    private HttpHeaders getJwtHeader(UserPrincipal user) {
         HttpHeaders headers = new HttpHeaders();
         headers.add(JWT_TOKEN_HEADER, jwtTokenProvider.generateJwtToken(user));
         return headers;
     }
+
 
     //2
     private void authenticate(String username, String password) {
