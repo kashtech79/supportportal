@@ -1,5 +1,6 @@
 package com.kash.service.serviceImpl;
 
+import com.sun.mail.smtp.SMTPTransport;
 import org.springframework.stereotype.Service;
 
 import javax.mail.Message;
@@ -16,6 +17,8 @@ import static javax.mail.Message.RecipientType.CC;
 
 @Service
 public class EmailService {
+
+    //3
     public void sendNewPasswordEmail(String firstName, String password, String email) throws MessagingException {
         Message message = createEmail(firstName, password, email);
         SMTPTransport smtpTransport = (SMTPTransport) getEmailSession().getTransport(SIMPLE_MAIL_TRANSFER_PROTOCOL);
