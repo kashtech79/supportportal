@@ -3,8 +3,6 @@ package com.kash.service.serviceImpl;
 import com.kash.domain.User;
 import com.kash.domain.UserPrincipal;
 import com.kash.exception.domain.EmailExistException;
-import com.kash.exception.domain.EmailNotFoundException;
-import com.kash.exception.domain.UserNotFoundException;
 import com.kash.exception.domain.UsernameExistException;
 import com.kash.repository.UserRepository;
 import com.kash.service.UserService;
@@ -39,11 +37,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private UserRepository userRepository;
     //8
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+    //
+    private LoginAttemptService loginAttemptService;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, LoginAttemptService loginAttemptService) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.loginAttemptService = loginAttemptService;
     }
 
     //2
@@ -54,12 +55,26 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             LOGGER.error(NO_USER_FOUND_BY_USERNAME + username);
             throw new UsernameNotFoundException(NO_USER_FOUND_BY_USERNAME  + username);
         }else {
+            validateLoginAttempt(user);
             user.setLastLoginDateDisplay((user.getLastLoginDate()));
             user.setLastLoginDate(new Date());
             userRepository.save(user);
             UserPrincipal userPrincipal = new UserPrincipal(user);
             LOGGER.info(FOUND_USER_BY_USERNAME + username);
             return userPrincipal;
+        }
+    }
+
+    private void validateLoginAttempt(User user) {
+        if(user.isNotLocked()){
+            if(loginAttemptService.hasExceededMaxAttempts(user.getUsername())){
+                user.setNotLocked(false);
+            } else {
+                user.setNotLocked(true);
+            }
+
+        }else{
+            loginAttemptService.evictUserFromLoginAttemptCache(user.getUsername());
         }
     }
 
