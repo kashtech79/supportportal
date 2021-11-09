@@ -21,12 +21,12 @@ public interface UserService {
 
     User addNewUser(String firstName, String lastName, String username, String email, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException);
 
-    User updateUser(String currentUsername, String newFirstName, String newLastName, String newUsername, String newEmail, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage);
+    User updateUser(String currentUsername, String newFirstName, String newLastName, String newUsername, String newEmail, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws EmailExistException, UsernameExistException;
 
     void deleteUser(String username);
 
-    void resetPassword(String email);
+    void resetPassword(String email) throws MessagingException;
 
-    User updateProfileImage(String username, MultipartFile profileImage);
+    User updateProfileImage(String username, MultipartFile profileImage) throws EmailExistException, UsernameExistException;
 
 }
