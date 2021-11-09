@@ -1,6 +1,11 @@
 package com.kash.service.serviceImpl;
 
 import com.sun.mail.smtp.SMTPTransport;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import javax.mail.Message;
@@ -14,11 +19,11 @@ import java.util.Properties;
 
 import static com.kash.constant.EmailConstant.*;
 import static javax.mail.Message.RecipientType.CC;
+import static javax.mail.Message.RecipientType.TO;
 
 @Service
 public class EmailService {
 
-    //3
     public void sendNewPasswordEmail(String firstName, String password, String email) throws MessagingException {
         Message message = createEmail(firstName, password, email);
         SMTPTransport smtpTransport = (SMTPTransport) getEmailSession().getTransport(SIMPLE_MAIL_TRANSFER_PROTOCOL);
@@ -27,19 +32,18 @@ public class EmailService {
         smtpTransport.close();
     }
 
-    //2
-    private Message createEmail(String firstName, String password, String email) throws MessagingException, MessagingException {
+    private Message createEmail(String firstName, String password, String email) throws MessagingException {
         Message message = new MimeMessage(getEmailSession());
         message.setFrom(new InternetAddress(FROM_EMAIL));
-        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email, false));
-        message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(CC_EMAIL, false));
+        message.setRecipients(TO, InternetAddress.parse(email, false));
+        message.setRecipients(CC, InternetAddress.parse(CC_EMAIL, false));
         message.setSubject(EMAIL_SUBJECT);
         message.setText("Hello " + firstName + ", \n \n Your new account password is: " + password + "\n \n The Support Team");
         message.setSentDate(new Date());
         message.saveChanges();
         return message;
     }
-    //1
+
     private Session getEmailSession() {
         Properties properties = System.getProperties();
         properties.put(SMTP_HOST, GMAIL_SMTP_SERVER);
