@@ -1,5 +1,6 @@
 package com.kash.service.serviceImpl;
 
+import com.kash.constant.UserImplConstant;
 import com.kash.domain.User;
 import com.kash.domain.UserPrincipal;
 import com.kash.enumeration.Role;
@@ -35,6 +36,7 @@ import java.util.Date;
 import java.util.List;
 
 import static com.kash.constant.FileConstant.*;
+import static com.kash.constant.FileConstant.DEFAULT_USER_IMAGE_PATH;
 import static com.kash.constant.UserImplConstant.*;
 import static com.kash.enumeration.Role.ROLE_USER;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
@@ -101,20 +103,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         User user = new User();
         user.setUserId(generateUserId());
         String password = generatePassword();
-        String encodedPassword = encodePassword(password);
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setUsername(username);
         user.setEmail(email);
         user.setJoinDate(new Date());
-        user.setPassword(encodedPassword);
+        user.setPassword(encodePassword(password));
         user.setActive(true);
         user.setNotLocked(true);
         user.setRole(ROLE_USER.name());
         user.setAuthorities(ROLE_USER.getAuthorities());
-        user.setProfileImageUrl(getTemporaryProfileImageUrl());
+        user.setProfileImageUrl(getTemporaryProfileImageUrl(username));
         userRepository.save(user);
-//        LOGGER.info("New user password: " + password);
+        LOGGER.info("New user password: " + password);
         emailService.sendNewPasswordEmail(firstName, password, email);
         return user;
     }
@@ -144,7 +145,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User updateUser(String currentUsername, String newFirstName, String newLastName, String newUsername, String newEmail, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws EmailExistException, UsernameExistException {
+    public User updateUser(String currentUsername, String newFirstName, String newLastName, String newUsername, String newEmail, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws EmailExistException, UsernameExistException, IOException {
         User currentUser = validNewUsernameAndEmail(currentUsername, newUsername, newEmail);
         currentUser.setFirstName(newFirstName);
         currentUser.setLastName(newLastName);
@@ -205,6 +206,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     private String setProfileImageUrl(String username) {
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path(USER_IMAGE_PATH + username + FORWARD_SLASH + username + DOT + JPG_EXTENSION).toUriString();
     }
 
     private Role getRoleEnumName(String role) {
@@ -214,6 +216,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     //10
     private String getTemporaryProfileImageUrl(String username) {
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path(DEFAULT_USER_IMAGE_PATH + username).toUriString();
     }
 
     //9
