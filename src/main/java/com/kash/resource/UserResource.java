@@ -50,6 +50,19 @@ public class UserResource extends ExceptionHandling {
         return new ResponseEntity<>(newUser, OK);
     }
 
+    @PostMapping("/add")
+    public ResponseEntity<User> addNewUser(@RequestParam("firstName") String firstName,
+                                           @RequestParam("lastName") String lastName,
+                                           @RequestParam("username") String username,
+                                           @RequestParam("email") String email,
+                                           @RequestParam("role") String role,
+                                           @RequestParam("isActive") String isActive,
+                                           @RequestParam("isNonLocked") String isNonLocked,
+                                           @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, IOException, NotAnImageFileException {
+        User newUser = userService.addNewUser(firstName, lastName, username,email, role, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
+        return new ResponseEntity<>(newUser, OK);
+    }
+
     //3
     private HttpHeaders getJwtHeader(UserPrincipal user) {
         HttpHeaders headers = new HttpHeaders();
