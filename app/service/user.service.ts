@@ -41,5 +41,16 @@ export class UserService {
     return this.http.delete<any>(`${this.host}/user/delete/${userId}`);
   }
 
+  public addUsersToLocalCache(users: User[]): void {
+    localStorage.setItem('users', JSON.stringify(users));
+  }
+
+    public getUsersLocalCache(): User[] {
+    if (localStorage.getItem('users')){
+      return JSON.parse(localStorage.getItem('users'));
+    }
+    return null;
+  }
+
 
 }
