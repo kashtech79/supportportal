@@ -10,6 +10,11 @@ import { User } from '../model/user';
 export class AuthenticationService {
 
   private host = environment.apiUrl;
+  private token: string;
+  private loggedInUsername: string;
+
+
+
   constructor(private http: HttpClient) {}
 
    public login(user: User): Observable<HttpResponse<any> | HttpErrorResponse>{
@@ -20,5 +25,14 @@ export class AuthenticationService {
    public register(user: User): Observable<User | HttpErrorResponse>{
      return this.http.post<User | HttpErrorResponse>
      (`$(this.host}/user/register`, user);
+   }
+
+   public logOut(): void{
+     this.token = null;
+     this.loggedInUsername = null;
+     localStorage.removeItem('user');
+     localStorage.removeItem('token');
+     localStorage.removeItem('users');
+
    }
 }
