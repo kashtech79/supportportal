@@ -15,4 +15,8 @@ export class UserService {
   public getUser(): Observable<User[] | HttpErrorResponse>{
     return this.http.get<User[]>(`${this.host}/user/list`)
   }
+
+  public addUser(formData: FormData): Observable<any>{
+    return this.http.get<User[]>(`${this.host}/user/add`, formData);
+  }
 }
