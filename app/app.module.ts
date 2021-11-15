@@ -11,7 +11,7 @@ import { AuthenticationGuard } from './guard/authentication.guard';
 import { NotificationModule } from './notification.module';
 import { NotificationService } from './service/notification.service';
 import { LoginComponent } from './component/login/login.component';
-import { RegisterComponent } from './register/register.component';
+import { RegisterComponent } from './component/register/register.component';
 import { UserComponent } from './component/user/user.component';
 
 @NgModule({
