@@ -21,5 +21,5 @@ import { AuthenticationGuard } from './guard(/authentication.guard';
   providers: [AuthenticationGuard, AuthenticationService, UserService,
               { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
   bootstrap: [AppComponent]
-})
+}) 
 export class AppModule { }
