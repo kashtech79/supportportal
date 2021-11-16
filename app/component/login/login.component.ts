@@ -28,23 +28,25 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
   }
 
-  public onLogin(user: User): void {
+ public onLogin(user: User): void {
     this.showLoading = true;
-    console.log(user);
     this.subscriptions.push(
-        this.authenticationService.login(user).subscribe(
+      this.authenticationService.login(user).subscribe(
         (response: HttpResponse<User>) => {
-          const token = response.headers.get('Jwt-Token');
+          const token = response.headers.get(HeaderType.JWT_TOKEN);
           this.authenticationService.saveToken(token);
           this.authenticationService.addUserToLocalCache(response.body);
           this.router.navigateByUrl('/user/management');
           this.showLoading = false;
-      },
-      (errorResponse: HttpErrorResponse)=> {
-        console.log(errorResponse);
-        this.sendErrorNotification(NotificationType.ERROR, errorResponse.message);)
-        this.showLoading = false
-      }
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendErrorNotification(NotificationType.ERROR, errorResponse.error.message);
+          this.showLoading = false;
+        }
+      )
+    );
+  }
+
   sendErrorNotification(notificationType: NotificationType, message: string) {
     if(message){
       this.notiticationService.notify(notificationType, message);
@@ -52,11 +54,10 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.notiticationService.notify(notificationType, 'An Error Occurred please try again');
     }
   }
-    )
-    );
-  }
+ 
 
   ngOnDestroy(): void {
+   this.subscriptions.forEach(sub => sub.unsubscribe()); 
   }
 
 }
