@@ -1,5 +1,5 @@
 export class User {
-  public id: number;
+ // public id: number;
   public userId: string;
   public firstName: string;
   public lastName: string;
@@ -24,7 +24,7 @@ export class User {
    // this.lastLoginDate = null;
    // this.lastLoginDateDisplay = null;
    // this.joinDate = null;
-   // this.profileImageUrl = '';
+    this.profileImageUrl = '';
     this.active = false;
     this.notLocked = false;
     this.role = '';

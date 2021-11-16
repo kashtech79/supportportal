@@ -60,18 +60,17 @@ export class AuthenticationService {
 
     public isUserLoggedIn(): boolean {
     this.loadToken();
-    if(this.token != null && this.token !== ''){
-      if(this.jwtHelper.decodeToken(this.token).sub != null || '') {
-        if (!this.jwtHelper.isTokenExpired(this.token)){
+    if (this.token != null && this.token !== ''){
+      if (this.jwtHelper.decodeToken(this.token).sub != null || '') {
+        if (!this.jwtHelper.isTokenExpired(this.token)) {
           this.loggedInUsername = this.jwtHelper.decodeToken(this.token).sub;
           return true;
         }
-      })
-
-    }else {
+      }
+    } else {
       this.logOut();
-      return;
+      return false;
     }
-    
-   }
+  }
+
 }

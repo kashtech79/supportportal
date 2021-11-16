@@ -6,7 +6,6 @@ import { NotificationType } from '../enum/notification-type-enum';
   providedIn: 'root'
 })
 export class NotificationService {
-  private notifier: NotifierService
 
   constructor(private notifier: NotifierService) { }
 
