@@ -2,6 +2,7 @@ import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { HeaderType } from '../../enum/header-type.enum';
 import { NotificationType } from '../../enum/notification-type-enum';
 import { User } from '../../model/user';
 import { AuthenticationService } from '../../service/authentication.service';
